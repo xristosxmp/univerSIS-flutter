@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:universis/loginWidgets/LoginPage.dart';
 import 'package:universis/splash/SplashScreenWidget.dart';
 
 
@@ -21,7 +22,7 @@ class _AppState extends State<App> {
       theme: ThemeData(
         scaffoldBackgroundColor: Colors.white
       ),
-      home: SplashScreen()
+      home: LoginPage()
     );
   }
 }

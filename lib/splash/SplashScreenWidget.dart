@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:universis/loginWidgets/LoginPage.dart';
 import 'package:universis/main/MainPage.dart';
 
 
@@ -26,7 +28,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 
   route() {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));
+    
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
   @override

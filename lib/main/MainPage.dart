@@ -44,7 +44,6 @@ class _MainPageState extends State<MainPage> {
               style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 16),
-            if (_token != null && _token != "invalid")
               SelectableText(
                 "Token:\n$_token",
                 style: const TextStyle(fontSize: 14),
