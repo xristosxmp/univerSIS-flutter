@@ -20,14 +20,13 @@ class _MainPageState extends State<MainPage> {
 
   Future<void> _loginAndGetToken() async {
     try {
-      final token = await AuthClient().login("xristosxmp", "wolckcho54!");
+      final token = await AuthClient().login("2342", "wolckcho54!");
       setState(() {
         _token = token;
-        _status = token == "invalid" ? "Invalid credentials" : "Token acquired";
       });
     } catch (e) {
       setState(() {
-        _status = "Login failed: $e";
+        _status = e.toString();
       });
     }
   }

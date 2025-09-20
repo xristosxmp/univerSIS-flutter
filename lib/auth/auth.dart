@@ -11,6 +11,8 @@ class AuthClient {
   final Dio _dio;
   final CookieJar _cookieJar;
 
+  final String internalErrorMessage = "Προέκυψε σφάλμα κατά την σύνδεση σας, παρακαλώ δοκιμάστε αργότερα";
+
   AuthClient()
       : _cookieJar = CookieJar(),
         _dio = Dio(BaseOptions(followRedirects: false)) {
@@ -56,8 +58,7 @@ class AuthClient {
   Future<String> login(String username, String password) async {
     final state = _generateState();
 
-    final initialUrl =
-        'https://unilogin.uop.gr/auth/realms/universis/protocol/openid-connect/auth?redirect_uri=https%3A%2F%2Funistudent.uop.gr%2Fauth%2Fcallback%2Findex.html&response_type=token&client_id=universis-student&scope=students&state=$state';
+    final initialUrl = 'https://unilogin.uop.gr/auth/realms/universis/protocol/openid-connect/auth?redirect_uri=https%3A%2F%2Funistudent.uop.gr%2Fauth%2Fcallback%2Findex.html&response_type=token&client_id=universis-student&scope=students&state=$state';
 
     var resp = await _dio.get(initialUrl, options: _requestOptions());
     resp = await _followRedirects(resp);
@@ -68,7 +69,7 @@ class AuthClient {
     final samlData = _extractFormFields(doc1, ['SAMLRequest', 'RelayState']);
 
     if (formUrl1.isEmpty || samlData.length < 2) {
-      throw Exception('Missing SAMLRequest/RelayState/form action');
+      throw Exception(internalErrorMessage);
     }
 
     resp = await _dio.post(formUrl1, data: samlData, options: _requestOptions(headers: {
@@ -78,7 +79,7 @@ class AuthClient {
 
     final doc2 = parse(resp.data.toString());
     final loginForm = doc2.getElementById('fm1');
-    if (loginForm == null) throw Exception('Login form not found');
+    if (loginForm == null) throw Exception(internalErrorMessage);
 
     final loginData = {
       'username': username,
@@ -96,7 +97,7 @@ class AuthClient {
     final doc3 = parse(resp.data.toString());
     final bodyText = doc3.body?.text ?? '';
     if (bodyText.contains('not recognized') || bodyText.contains('failed')) {
-      return 'invalid';
+      throw Exception("Invalid Credentials");
     }
 
     // Confirm step
@@ -114,7 +115,7 @@ class AuthClient {
     final samlFinalData = _extractFormFields(finalDoc, ['SAMLResponse', 'RelayState']);
 
     if (finalUrl.isEmpty || samlFinalData.length < 2) {
-      throw Exception('Missing final SAMLResponse or RelayState');
+      throw Exception(internalErrorMessage);
     }
 
     resp = await _dio.post(finalUrl, data: samlFinalData, options: _requestOptions(headers: {
@@ -127,7 +128,7 @@ class AuthClient {
         final end = location.indexOf('&token_type'); 
         final token = location.substring(start, end); 
         return token; 
-    }else  throw Exception('No access_token in redirect location');  } 
-  else  throw Exception('Expected redirect after SAMLResponse post, got status: ${resp.statusCode}');   
+    }else  throw Exception(internalErrorMessage);  } 
+  else  throw Exception(internalErrorMessage);   
   } 
 }
