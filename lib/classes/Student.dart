@@ -5,33 +5,38 @@ import 'package:http/http.dart' as http;
 // Student Model
 // ------------------------
 class Student {
-  final int id;
   final String name;
   final String studentIdentifier;
   final String departmentName;
+    final String departmentCity;
   final String programName;
   final String email;
   final String gender;
-
+  final int semester;
+  final String entryYear;
   Student({
-    required this.id,
     required this.name,
     required this.studentIdentifier,
     required this.departmentName,
+    required this.departmentCity,
     required this.programName,
     required this.email,
-    required this.gender
+    required this.gender,
+    required this.semester,
+    required this.entryYear
   });
 
   factory Student.fromJson(Map<String, dynamic> json) {
     return Student(
-      id: json['id'],
       name: json['person']['name'] ?? '',
       studentIdentifier: json['studentIdentifier'] ?? '',
       departmentName: json['department']['name'] ?? '',
+      departmentCity: json['department']['city'] ?? '',
       programName: json['studyProgram']['name'] ?? '',
       email: json['person']['email'] ?? '',
       gender: json['person']['gender']['identifier'] ?? 'Α',
+      semester: json['semester'] ?? -1,
+      entryYear: json['inscriptionYear']['alternateName'] ?? ''
     );
   }
 }

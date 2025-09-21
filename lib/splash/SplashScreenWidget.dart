@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:universis/auth/auth.dart';
+import 'package:universis/classes/Auth.dart';
+import 'package:universis/classes/Student.dart';
+import 'package:universis/exceptions/UnauthorizedException.dart';
 import 'package:universis/loginWidgets/LoginPage.dart';
 import 'package:universis/main/MainPage.dart';
+import 'package:universis/main/StudentDashboard.dart';
 
 
 class SplashScreen extends StatefulWidget {
@@ -27,8 +32,26 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     super.dispose();
   }
 
-  route() {
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+  route() async {
+
+    bool isActive = await Auth.isStudentActive();
+    if (isActive) {
+          print("isActive");
+          try {
+            Auth? activeUser = await Auth.getStudent();
+            if(activeUser == null) Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+      
+            AuthClient client = AuthClient();
+            String token = await client.login(activeUser!.username, activeUser.password);
+            Student student = await getStudentInfo(token);
+            return Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => StudentDashboard(student: student)));
+          } on UnauthorizedException {
+              return Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+          } catch (e) {
+              return Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+          }
+    }
+    return Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
   @override

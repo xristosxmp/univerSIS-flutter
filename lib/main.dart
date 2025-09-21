@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:universis/loginWidgets/LoginPage.dart';
+import 'package:universis/splash/SplashScreenWidget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,7 +40,7 @@ class App extends StatelessWidget {
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
         ),
-        home: const LoginPage(),
+        home: const SplashScreen(),
       ),
     );
   }

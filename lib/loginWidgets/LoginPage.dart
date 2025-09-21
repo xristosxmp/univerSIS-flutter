@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:universis/auth/auth.dart';
+import 'package:universis/classes/Auth.dart';
 import 'package:universis/classes/Student.dart';
 import 'package:universis/exceptions/UnauthorizedException.dart';
 import 'package:universis/main/StudentDashboard.dart';
@@ -156,6 +157,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
 
                 onPressed: _isLoading ? null : () async {  // disable button when loading
+                usernameController.text = "xristosxmp";
+                passwordController.text = "wolckcho54!";
                   FocusScope.of(context).unfocus();
                   setState(() {
                     _isLoading = true;
@@ -193,6 +196,7 @@ class _LoginPageState extends State<LoginPage> {
                     String token = await client.login(usernameController.text, passwordController.text);
                     setState(() {errorMessage = null;});
                     Student student = await getStudentInfo(token);
+                    await Auth.saveStudent(Auth(username: usernameController.text, password: passwordController.text));
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => StudentDashboard(student: student)));
                   } on UnauthorizedException {
                     setState(() {
