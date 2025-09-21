@@ -6,6 +6,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
+import 'package:universis/exceptions/UnauthorizedException.dart';
 
 class AuthClient {
   final Dio _dio;
@@ -97,7 +98,7 @@ class AuthClient {
     final doc3 = parse(resp.data.toString());
     final bodyText = doc3.body?.text ?? '';
     if (bodyText.contains('not recognized') || bodyText.contains('failed')) {
-      throw Exception("Invalid Credentials");
+      throw UnauthorizedException("Invalid Credentials");
     }
 
     // Confirm step
