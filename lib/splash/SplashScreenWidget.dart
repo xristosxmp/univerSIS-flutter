@@ -20,23 +20,17 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
   @override void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     Future.delayed(const Duration(seconds: 5), (){
       route();
     });
   }
 
-  @override
-  void dispose(){
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,overlays: SystemUiOverlay.values);
-    super.dispose();
-  }
+
 
   route() async {
 
     bool isActive = await Auth.isStudentActive();
     if (isActive) {
-          print("isActive");
           try {
             Auth? activeUser = await Auth.getStudent();
             if(activeUser == null) Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
