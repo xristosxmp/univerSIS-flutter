@@ -55,13 +55,14 @@ Future<Student> getStudentInfo(final String token) async {
     final Map<String, dynamic> jsonData = jsonDecode(response.body);
 
     // Fetch semesters
-    final List<Semester> semesters = await getSemesters(token);
+    final List<Semester> semesters = [];//await getSemesters(token);
     return Student.fromJson(jsonData,semesters);
   } else {
     throw Exception('Failed to fetch student data');
   }
 }
 
+// Contains grades-courses
 Future<List<Semester>> getSemesters(String token) async {
   final String url = r"https://uniapi.uop.gr/api/students/me/courses?$expand=course($expand=locale),courseType($expand=locale),gradeExam($expand=instructors($expand=instructor($select=InstructorSummary)))&$orderby=semester%20desc,gradeYear%20desc&$top=-1&$count=false";
   final response = await http.get(
