@@ -3,264 +3,63 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:linear_progress_bar/linear_progress_bar.dart';
+import 'package:linear_progress_bar/ui/circular_percent_indicator.dart';
 import 'package:universis/classes/Auth.dart';
 import 'package:universis/classes/Student.dart';
 import 'package:universis/loginWidgets/LoginPage.dart';
+import 'package:universis/main/CoursesAndGradesPage.dart';
+import 'package:universis/widgets/studentSheet/WelcomeWidget.dart';
+import 'package:universis/widgets/studentSheet/SheetWelcomeWidget.dart';
+import 'package:universis/widgets/studentSheet/SheetRow.dart';
+import 'package:universis/widgets/studentSheet/LogoutWidget.dart';
 
 class StudentDashboard extends StatefulWidget {
   final Student student;
+
   const StudentDashboard({Key? key, required this.student}) : super(key: key);
-  @override State<StudentDashboard> createState() => _StudentDashboardState();
+
+  @override
+  State<StudentDashboard> createState() => _StudentDashboardState();
 }
 
 class _StudentDashboardState extends State<StudentDashboard> {
 
-Widget _buildSheetWelcomeWidget(final String gender, final String name, final Color defaultTextColor){
-                          return Container(
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SvgPicture.asset(
-                                    gender == 'Α'
-                                        ? 'assets/images/male-gender.svg'
-                                        : 'assets/images/female-gender.svg',
-                                    width: 72,
-                                    height: 72,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    name,
-                                    textAlign: TextAlign.center,
-                                    softWrap: true,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.normal,
-                                      color: defaultTextColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-}
-Widget _buildColoredBall(Color color) {
-  return Container(
-    width: 24,
-    height: 24,
-    decoration: BoxDecoration(
-      color: color,
-      shape: BoxShape.circle,
-      border: Border.all(color: Colors.white, width: 2),
-    ),
-  );
-}
-Widget _buildHalfColoredBall(Color leftColor, Color rightColor) {
-  return SizedBox(
-    width: 24,
-    height: 24,
-    child: Stack(
-      children: [
-        // Right half
-        Align(
-          alignment: Alignment.centerRight,
-          child: Container(
-            width: 12,
-            height: 24,
-            decoration: BoxDecoration(
-              color: rightColor,
-              borderRadius: const BorderRadius.horizontal(
-                right: Radius.circular(12),
-              ),
+  Future<bool?> showConfirmationDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return CupertinoAlertDialog(
+          title: const Text("Αποσύνδεση"),
+          content: const Text("Είστε σίγουροι ότι θέλετε να αποσυνδεθείτε;"),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('Ακύρωση'),
+              onPressed: () => Navigator.of(dialogContext).pop(false),
             ),
-          ),
-        ),
-        // Left half
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Container(
-            width: 12,
-            height: 24,
-            decoration: BoxDecoration(
-              color: leftColor,
-              borderRadius: const BorderRadius.horizontal(
-                left: Radius.circular(12),
-              ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              child: const Text('Αποσύνδεση'),
+              onPressed: () async {
+                await Auth.deleteStudent();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => LoginPage()),
+                );
+              },
             ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-Widget _buildSemesterWidget(final String start,final String center,final String end, final int semester) {
-  const ballSize = 24.0;
-  const lineHeight = 2.0;
-  const lineColor = Color(0xFFBDBDBD); // gray line
-  const activeColor = Color(0xFF5C6BC0); // purple
+          ],
+        );
+      },
+    );
+  }
 
-  return SizedBox(
-    height: 80, // More height to fit all three labels
-    child: Stack(
-      children: [
-        // Horizontal line centered
-        Positioned(
-          top: (80 - lineHeight) / 2,
-          left: 0,
-          right: 0,
-          child: Container(
-            height: lineHeight,
-            color: lineColor,
-          ),
-        ),
+  void _studentDetailsSheet(final Student student) {
+    const Color defaultTextColor = Color(0xFF3E515B);
 
-        // Balls aligned on the line
-        Positioned(
-          top: (80 - ballSize) / 2,
-          left: 0,
-          right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              if(semester == 1)... [
-                _buildHalfColoredBall(activeColor, Colors.grey),
-                _buildColoredBall(Colors.grey),
-                _buildColoredBall(Colors.grey)
-              ]else if(semester != 1) ...[
-                _buildColoredBall(activeColor),
-                _buildHalfColoredBall(activeColor, Colors.grey),
-                _buildColoredBall(Colors.grey),
-              ]
-            ],
-          ),
-        ),
-
-        // Labels under each ball
-        Positioned(
-          top: ((80 - ballSize) / 2) + ballSize + 6,
-          left: 0,
-          right: 0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                start,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-              ),
-              Text(
-                center,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-              ),
-              Text(
-                end,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  );
-}
-Widget _buildSheetRow(final String iconAsset, final String value, final Color defaultTextColor){
-                return Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child:                         Row(children: [
-                          SvgPicture.asset(width:26,height: 26,iconAsset,color: Color(0xFF5C6BC0)),
-                          const SizedBox(width: 16),
-                          Expanded(child:
-                          Text(
-                            value,
-                            textAlign: TextAlign.start,
-                            softWrap: true,
-                            style: TextStyle(fontSize: 16,fontWeight: FontWeight.normal, color: defaultTextColor),
-                          )),  
-                    ])
-                  );
-}
-Future<bool?> showConfirmationDialog(BuildContext context) {
-  return showDialog<bool>(
-    context: context,
-    builder: (BuildContext dialogContext) {
-      return CupertinoAlertDialog(
-        title: Text("Αποσύνδεση"),
-        content: Text("Είστε σίγουροι ότι θέλετε να αποσυνδεθείτε;"),
-        actions: [
-          CupertinoDialogAction(
-            child: Text('Ακύρωση'),
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-          ),
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            child: Text('Αποσύνδεση'),
-            onPressed: () async {
-              await Auth.deleteStudent();
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
-            },
-          ),
-        ],
-      );
-    },
-  );
-}
-Widget _buildDisconnectionWidget(final String iconAsset, BuildContext sheetContext) {
-  return GestureDetector(
-    onTap: () => showConfirmationDialog(sheetContext), // Pass the sheet's context
-    child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          SvgPicture.asset(
-              width: 26,
-              height: 26,
-              iconAsset,
-              color: const Color(0xffDE3163)),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Text(
-              'Αποσύνδεση',
-              textAlign: TextAlign.start,
-              softWrap: true,
-              style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.normal,
-                  color: Color(0xffDE3163)),
-            ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-void _studentDetailsSheet(final Student student){
-    const Color defaultTextColor = const Color(0xFF3E515B);
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Enables full height
+      isScrollControlled: true,
       backgroundColor: const Color.fromARGB(255, 240, 240, 240),
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -274,7 +73,7 @@ void _studentDetailsSheet(final Student student){
           builder: (context, scrollController) {
             return Column(
               children: [
-                // Drag marker
+                // Drag handle
                 Container(
                   width: 40,
                   height: 5,
@@ -285,31 +84,62 @@ void _studentDetailsSheet(final Student student){
                   ),
                 ),
 
-                // Content
                 Expanded(
                   child: ListView(
                     controller: scrollController,
                     padding: const EdgeInsets.all(16),
                     children: [
-                        
-                         _buildSheetWelcomeWidget(student.gender,student.name,defaultTextColor),
 
-                        const SizedBox(height: 8),
-                        if(student.semester != 1)
-                          _buildSemesterWidget((student.semester-1).toString()+'ο Εξάμηνο',(student.semester).toString()+'ο Εξάμηνο',(student.semester+1).toString()+'ο Εξάμηνο',student.semester)
-                        else _buildSemesterWidget((student.semester).toString()+'ο Εξάμηνο',(student.semester+1).toString()+'ο Εξάμηνο',(student.semester+2).toString()+'ο Εξάμηνο',student.semester),
-                        const SizedBox(height: 8),
-                        _buildSheetRow("assets/icons/calendar.svg",student.entryYear,defaultTextColor),
-                        const SizedBox(height: 8),
-                        _buildSheetRow("assets/icons/id-card.svg",student.studentIdentifier,defaultTextColor),
-                        const SizedBox(height: 8),
-                        _buildSheetRow("assets/icons/building.svg",student.departmentName,defaultTextColor),
-                        const SizedBox(height: 8),
-                        _buildSheetRow("assets/icons/programme.svg",student.programName,defaultTextColor),
-                        const SizedBox(height: 8),
-                        _buildSheetRow("assets/icons/location.svg",student.departmentCity,defaultTextColor),
-                        const SizedBox(height: 8),
-                        _buildDisconnectionWidget("assets/icons/logout.svg",context)
+                      // ✅ Welcome card
+                      SheetWelcomeWidget(
+                        gender: student.gender,
+                        name: student.name,
+                        textColor: defaultTextColor,
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // ✅ Info rows
+                      SheetRow(
+                        icon: "assets/icons/calendar.svg",
+                        value: student.entryYear,
+                        textColor: defaultTextColor,
+                      ),
+                      const SizedBox(height: 8),
+
+                      SheetRow(
+                        icon: "assets/icons/id-card.svg",
+                        value: student.studentIdentifier,
+                        textColor: defaultTextColor,
+                      ),
+                      const SizedBox(height: 8),
+
+                      SheetRow(
+                        icon: "assets/icons/building.svg",
+                        value: student.departmentName,
+                        textColor: defaultTextColor,
+                      ),
+                      const SizedBox(height: 8),
+
+                      SheetRow(
+                        icon: "assets/icons/programme.svg",
+                        value: student.programName,
+                        textColor: defaultTextColor,
+                      ),
+                      const SizedBox(height: 8),
+
+                      SheetRow(
+                        icon: "assets/icons/location.svg",
+                        value: student.departmentCity,
+                        textColor: defaultTextColor,
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // ✅ Logout
+                      LogoutWidget(
+                        onTap: () => showConfirmationDialog(context),
+                      ),
                     ],
                   ),
                 ),
@@ -319,57 +149,118 @@ void _studentDetailsSheet(final Student student){
         );
       },
     );
-}
-Widget _buildWelcomeWidget() {
-  const Color defaultTextColor = const Color(0xFF3E515B);
-  return 
-    Row(
-    mainAxisAlignment: MainAxisAlignment.start,
-    crossAxisAlignment: CrossAxisAlignment.start, 
+  }
+
+    @override
+    Widget build(BuildContext context) {
+      return Scaffold(
+        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              WelcomeWidget(
+                student: widget.student,
+                onTap: () => _studentDetailsSheet(widget.student),
+              ),
+
+              const SizedBox(height: 16),
+Container(
+  padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
+  decoration: BoxDecoration(
+    color: Colors.white, // white background
+    borderRadius: const BorderRadius.only(
+      topLeft: Radius.circular(46),
+      bottomLeft: Radius.circular(46),
+      topRight: Radius.circular(16),
+      bottomRight: Radius.circular(16),
+    ), // rounded corners
+  ),
+  child: Row(
     children: [
-
-            Expanded(child:
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start, 
-              children: [
-              Text(
-                  "Πίνακας Ελέγχου",
-                  style: const TextStyle(color: defaultTextColor,fontSize: 26,fontWeight: FontWeight.bold),
-                ),
-                 Text(
-                    widget.student.name,
-                    textAlign: TextAlign.start,
-                    softWrap: true,
-                    style: const TextStyle(fontSize: 16,fontWeight: FontWeight.normal, color: defaultTextColor),
-                  ),
-            ])),
- 
-          GestureDetector(
-            onTap:() => _studentDetailsSheet(widget.student),
-            child: SvgPicture.asset(
-              width: 72,
-              height: 72,
-              widget.student.gender == 'Α'
-                  ? 'assets/images/male-gender.svg'
-                  : 'assets/images/female-gender.svg',
-            ),
-          )
-        ],
-  );
-}
-
-
-  @override Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            _buildWelcomeWidget()
-          ],
+      CircularPercentIndicator(
+        percent: 1.0, // (double.tryParse(widget.student.averageGrade) ?? 0) / 10,
+        radius: 40,
+        lineWidth: 6,
+        progressColor: const Color(0xFFc41162),
+        backgroundColor: Colors.transparent,
+        circularStrokeCap: CircularStrokeCap.round,
+        startAngle: CircularStartAngle.bottom,
+        spacing: 0.0,
+        arcType: ArcType.full,
+        center: Text(
+          "${widget.student.averageGrade}\nΜ.Ο",
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-    );
-  }
+      const SizedBox(width: 16), // spacing between circle and text column
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children:  [
+          // First row: label and number
+          Text(
+            "Δηλωμένα Μαθήματα",
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          ),
+          SizedBox(height: 2),
+          Text(
+            widget.student.totalCourses?.toString() ?? '0', // example number, replace with your value
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8),
+
+          // Example of adding another metric
+          Text(
+            "Passed Courses",
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          ),
+          SizedBox(height: 2),
+          Text(
+            widget.student.totalPassedCourses?.toString() ?? '0', // example number
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          ),
+        ],
+      ),
+    ],
+  ),
+)
+
+
+
+
+            ],
+          ),
+        ),
+        bottomNavigationBar: BottomAppBar(
+            surfaceTintColor: Colors.transparent,
+            color: Colors.transparent,
+            child: Center(
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          CoursesAndGradesPage(student: widget.student),
+                    ),
+                  );
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset("assets/icons/progress.svg", width: 26, height: 26, color: const Color(0xFF5C6BC0)),
+                    Text("Grades"),
+                  ],
+                ),
+              ),
+            ),
+        ),
+
+      );
+    }
 }

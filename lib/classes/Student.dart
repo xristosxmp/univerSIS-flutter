@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:universis/classes/info/Course.dart';
 import 'package:universis/classes/info/Semester.dart';
 
 // ------------------------
@@ -16,6 +18,9 @@ class Student {
   final int semester;
   final String entryYear;
   final List<Semester> semesters;
+  final String averageGrade;
+  final int totalCourses;
+  final int totalPassedCourses;
   Student({
     required this.name,
     required this.studentIdentifier,
@@ -26,10 +31,35 @@ class Student {
     required this.gender,
     required this.semester,
     required this.entryYear,
-    required this.semesters
+    required this.semesters,
+    required this.averageGrade,
+
+    required this.totalCourses,
+    required this.totalPassedCourses,
   });
 
   factory Student.fromJson(Map<String, dynamic> json, List<Semester> semesters) {
+    double total = 0;
+    int count = 0;
+    int totalCourses = 0;
+    int totalPassed = 0;
+  
+
+    for (var semester in semesters) {
+      for (var course in semester.courses) {
+        final grade = double.tryParse(course.grade);
+        totalCourses+=1;
+        if (grade != null) {
+          if(course.isPassed) totalPassed+=1;
+
+
+          total += grade;
+          count++;
+        }
+      }
+    }
+
+    final avgGrade = count > 0 ? (total / count).toStringAsFixed(2) : 'N/A';
     return Student(
       name: json['person']['name'] ?? '',
       studentIdentifier: json['studentIdentifier'] ?? '',
@@ -41,6 +71,9 @@ class Student {
       semester: json['semester'] ?? -1,
       entryYear: json['inscriptionYear']['alternateName'] ?? '',
       semesters: semesters,
+      averageGrade: avgGrade,
+      totalCourses: totalCourses,
+      totalPassedCourses: totalPassed,
     );
   }
 }
@@ -55,7 +88,7 @@ Future<Student> getStudentInfo(final String token) async {
     final Map<String, dynamic> jsonData = jsonDecode(response.body);
 
     // Fetch semesters
-    final List<Semester> semesters = [];//await getSemesters(token);
+    final List<Semester> semesters = await getSemesters(token);
     return Student.fromJson(jsonData,semesters);
   } else {
     throw Exception('Failed to fetch student data');
@@ -74,8 +107,41 @@ Future<List<Semester>> getSemesters(String token) async {
   );
 
   if (response.statusCode == 200) {
-    final List<dynamic> data = jsonDecode(response.body);
-    return data.map((json) => Semester.fromJson(json)).toList();
+    final Map<String, dynamic> jsonData = jsonDecode(response.body);
+    final List<dynamic> data = jsonData['value'];
+    // Map<semesterName, List<Course>>
+    final Map<String, List<Course>> grouped = {};
+    for (var item in data) {
+      final String semesterName = item['semester']['name'] ?? 'Unknown';
+      final course = Course.fromJson(item);
+      if (!grouped.containsKey(semesterName)) grouped[semesterName] = [];
+    
+      grouped[semesterName]!.add(course);
+    }
+
+    // Convert to List<Semester>
+    return grouped.entries.map((entry) {
+   final courses = entry.value;
+
+      // Calculate average grade for this semester
+      double total = 0;
+      int count = 0;
+      for (var course in courses) {
+        final gradeValue = double.tryParse(course.grade);
+        if (gradeValue != null) {
+          total += gradeValue;
+          count++;
+        }
+      }
+      final avg = count > 0 ? (total / count) : 0.0;
+      final avgStr = avg > 0 ? avg.toStringAsFixed(2) : '-';
+
+      return Semester(
+        name: entry.key,
+        courses: courses,
+        averageGrade: avgStr,
+      );
+    }).toList();
   } else {
     throw Exception('Failed to fetch semesters');
   }

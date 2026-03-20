@@ -157,8 +157,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
 
                 onPressed: _isLoading ? null : () async {  // disable button when loading
-                usernameController.text = "xristosxmp";
-                passwordController.text = "wolckcho54!";
+                usernameController.text = "dit2529cst";
+                passwordController.text = 'PETROS\$69881642';
                   FocusScope.of(context).unfocus();
                   setState(() {
                     _isLoading = true;
@@ -203,6 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                       errorMessage = "Ο λογαριασμός σας δεν αναγνωρίζεται και δεν μπορείτε να συνδεθείτε αυτήν τη στιγμή";
                     });
                   } catch (e) {
+                    debugPrint(e.toString());
                     setState(() {
                       errorMessage = "Προέκυψε κάποιο σφάλμα, παρακαλώ δοκιμάστε ξανά αργότερα";
                     });
