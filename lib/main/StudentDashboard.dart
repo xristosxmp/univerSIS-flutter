@@ -1,14 +1,13 @@
 import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:linear_progress_bar/linear_progress_bar.dart';
-import 'package:linear_progress_bar/ui/circular_percent_indicator.dart';
 import 'package:universis/classes/Auth.dart';
 import 'package:universis/classes/Student.dart';
 import 'package:universis/loginWidgets/LoginPage.dart';
 import 'package:universis/main/CoursesAndGradesPage.dart';
+import 'package:universis/main/ProgressIndicatorHomeWidget.dart';
+import 'package:universis/main/RecentGradesWidget.dart';
 import 'package:universis/widgets/studentSheet/WelcomeWidget.dart';
 import 'package:universis/widgets/studentSheet/SheetWelcomeWidget.dart';
 import 'package:universis/widgets/studentSheet/SheetRow.dart';
@@ -16,11 +15,8 @@ import 'package:universis/widgets/studentSheet/LogoutWidget.dart';
 
 class StudentDashboard extends StatefulWidget {
   final Student student;
-
   const StudentDashboard({Key? key, required this.student}) : super(key: key);
-
-  @override
-  State<StudentDashboard> createState() => _StudentDashboardState();
+  @override State<StudentDashboard> createState() => _StudentDashboardState();
 }
 
 class _StudentDashboardState extends State<StudentDashboard> {
@@ -151,116 +147,90 @@ class _StudentDashboardState extends State<StudentDashboard> {
     );
   }
 
-    @override
-    Widget build(BuildContext context) {
-      return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 240, 240, 240),
-        body: SafeArea(
-          child: ListView(
-            padding: const EdgeInsets.all(16),
-            children: [
-              WelcomeWidget(
-                student: widget.student,
-                onTap: () => _studentDetailsSheet(widget.student),
-              ),
 
-              const SizedBox(height: 16),
-Container(
-  padding: const EdgeInsets.fromLTRB(8, 16, 8, 16),
-  decoration: BoxDecoration(
-    color: Colors.white, // white background
-    borderRadius: const BorderRadius.only(
-      topLeft: Radius.circular(46),
-      bottomLeft: Radius.circular(46),
-      topRight: Radius.circular(16),
-      bottomRight: Radius.circular(16),
-    ), // rounded corners
-  ),
-  child: Row(
-    children: [
-      CircularPercentIndicator(
-        percent: 1.0, // (double.tryParse(widget.student.averageGrade) ?? 0) / 10,
-        radius: 40,
-        lineWidth: 6,
-        progressColor: const Color(0xFFc41162),
-        backgroundColor: Colors.transparent,
-        circularStrokeCap: CircularStrokeCap.round,
-        startAngle: CircularStartAngle.bottom,
-        spacing: 0.0,
-        arcType: ArcType.full,
-        center: Text(
-          "${widget.student.averageGrade}\nΜ.Ο",
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+    @override Widget build(BuildContext context) {
+        final items = <Widget>[
+          WelcomeWidget(
+            student: widget.student,
+            onTap: () => _studentDetailsSheet(widget.student),
           ),
-        ),
-      ),
-      const SizedBox(width: 16), // spacing between circle and text column
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children:  [
-          // First row: label and number
-          Text(
-            "Δηλωμένα Μαθήματα",
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-          ),
-          SizedBox(height: 2),
-          Text(
-            widget.student.totalCourses?.toString() ?? '0', // example number, replace with your value
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
 
-          // Example of adding another metric
-          Text(
-            "Passed Courses",
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-          ),
-          SizedBox(height: 2),
-          Text(
-            widget.student.totalPassedCourses?.toString() ?? '0', // example number
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
-    ],
-  ),
-)
+          const SizedBox(height: 16),
 
+          ProgressIndicatorHomeWidget(student: widget.student),
 
-
-
-            ],
-          ),
-        ),
-        bottomNavigationBar: BottomAppBar(
-            surfaceTintColor: Colors.transparent,
-            color: Colors.transparent,
-            child: Center(
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          CoursesAndGradesPage(student: widget.student),
-                    ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset("assets/icons/progress.svg", width: 26, height: 26, color: const Color(0xFF5C6BC0)),
-                    Text("Grades"),
-                  ],
+          const SizedBox(height: 16),
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CoursesAndGradesPage(student: widget.student)
                 ),
+              );
+            },
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                //border: Border.all(color: const Color(0xFF5C6BC0), width: 1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  // Left side (icon + text)
+                  SvgPicture.asset(
+                    "assets/icons/puzzle.svg",
+                    width: 26,
+                    height: 26,
+                    color: const Color(0xFF73818e),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    "Αναλυτικη Βαθμολογια",
+                    style: TextStyle(
+                      color: Color(0xFF73818e),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  // Right side arrow
+                  const Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16,
+                    color: Color(0xFF73818e),
+                  ),
+                ],
               ),
             ),
-        ),
+          ),
 
-      );
+
+          const SizedBox(height: 16),
+
+          if (widget.student.recentCoursesGraded.isNotEmpty) ...[
+            const SizedBox(height: 32),
+            RecentGradesWidget(student: widget.student),
+          ],
+        ];
+
+
+        return Scaffold(
+          backgroundColor: const Color.fromARGB(255, 240, 240, 240),
+          body: SafeArea(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                return items[index];
+              },
+            ),
+          ),
+        );
     }
 }

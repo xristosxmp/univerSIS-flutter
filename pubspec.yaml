@@ -47,6 +47,10 @@ dependencies:
   url_launcher: ^6.3.2
   flutter_svg: ^2.2.4
   linear_progress_bar: ^3.0.0
+  my_progress_bar: ^2.1.0
+  auto_size_text: ^3.0.0
+  flexiblebox: ^1.0.4
+  flex_list: ^1.2.0
 
 dev_dependencies:
   flutter_test:

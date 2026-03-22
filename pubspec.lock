@@ -17,6 +17,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.0"
+  auto_size_text:
+    dependency: "direct main"
+    description:
+      name: auto_size_text
+      sha256: "3f5261cd3fb5f2a9ab4e2fc3fba84fd9fcaac8821f20a1d4e71f557521b22599"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -81,6 +89,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  data_widget:
+    dependency: transitive
+    description:
+      name: data_widget
+      sha256: "4947aae3c50635496d56f94ad18de98e19015c5ebf01abee0f39a2c098c7021a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   dio:
     dependency: "direct main"
     description:
@@ -137,6 +153,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.1"
+  flex_list:
+    dependency: "direct main"
+    description:
+      name: flex_list
+      sha256: c41dc497e972e58899a8173ab0329222e220d4bab4d83454e325e75e21655da2
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
+  flexiblebox:
+    dependency: "direct main"
+    description:
+      name: flexiblebox
+      sha256: deeefe81387a1bda9a82675645210dbf85cde7873457ac59c5ffcf0e95eb8917
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -264,6 +296,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  my_progress_bar:
+    dependency: "direct main"
+    description:
+      name: my_progress_bar
+      sha256: c37a42c9d37601f284dd869e5e70f3a30e1d6cc61c7fcedbf4e8e52c73344253
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   path:
     dependency: transitive
     description:

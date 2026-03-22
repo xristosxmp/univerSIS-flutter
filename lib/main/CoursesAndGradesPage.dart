@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:universis/classes/Student.dart';
+import 'package:universis/main/CourseDetailsPage.dart';
 
 class CoursesAndGradesPage extends StatelessWidget {
   final Student student;
@@ -13,25 +14,21 @@ class CoursesAndGradesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // Create a sorted copy (IMPORTANT)
     final semesters = [...student.semesters];
-
-    // Sort by semester name (Α, Β, Γ... works fine in Greek)
     semesters.sort((a, b) => a.name.compareTo(b.name));
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 240, 240, 240),
       appBar: AppBar(
-
         surfaceTintColor: Colors.transparent,
         backgroundColor: const Color.fromARGB(255, 240, 240, 240),
         elevation: 0,
-        title: const Text("Βαθμολογίες"),
       ),
       body: SafeArea(
         child: ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: semesters.length,
-          itemBuilder: (context, index) {
-            final semester = semesters[index];
+          itemBuilder: (context, semIndex) {
+            final semester = semesters[semIndex];
 
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +39,6 @@ class CoursesAndGradesPage extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      // Left: Semester name
                       Text(
                         semester.name,
                         style: const TextStyle(
@@ -50,7 +46,6 @@ class CoursesAndGradesPage extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      // Right: Average grade container
                       Container(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
@@ -78,68 +73,84 @@ class CoursesAndGradesPage extends StatelessWidget {
 
                 const SizedBox(height: 10),
 
-                // 📖 Courses
-              ...semester.courses.map((course) {
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Left side: code, title, type
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              course.code,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              course.title,
-                              style: const TextStyle(
-                                fontSize: 16,
-                              )
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              course.type,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Right side: grade
-                      Container(
-                        alignment: Alignment.center,
-                        width: 60, // fixed width for grades
-                        child: Text(
-                          course.grade != null ? "${course.grade}" : "-",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: course.isPassed ? Colors.green : Colors.red,
+                // 📖 Courses (ListView.builder)
+                ListView.builder(
+                  shrinkWrap: true, // important to make nested ListView work
+                  physics: const NeverScrollableScrollPhysics(), // disable inner scrolling
+                  itemCount: semester.courses.length,
+                  itemBuilder: (context, courseIndex) {
+                    final course = semester.courses[courseIndex];
+                    return InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CourseDetailsPage(course: course, token: student.authToken),
                           ),
-                        ),
+                        );
+                      },
+                      child: Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ],
-                  ),
-                );
-              }).toList(),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Left side: code, title, type
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  course.code,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                  ),
+                                ),
 
-                const SizedBox(height: 20),
+                                const SizedBox(height: 2),
+                                Text(
+                                  course.title,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight(600)
+                                    ),
+                                ),
+                                if(!course.gradePeriod.trim().isEmpty)
+                                const SizedBox(height: 2),
+                                if(!course.gradePeriod.trim().isEmpty)                      
+                                Text(
+                                  course.gradePeriod.trim().isEmpty ? '' : course.gradePeriod,
+                                  style: const TextStyle(
+                                    fontSize: 12
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Right side: grade
+                          Container(
+                            alignment: Alignment.center,
+                            width: 60,
+                            child: Text(
+                              course.grade != null && course.grade.isNotEmpty ? "${course.grade}" : "-",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: course.grade.isEmpty ? Colors.black : course.isPassed ? Colors.green : Colors.red,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ));
+                  },
+                ),
               ],
             );
           },
