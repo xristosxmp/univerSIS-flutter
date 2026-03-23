@@ -7,8 +7,7 @@ class CoursesAndGradesPage extends StatelessWidget {
 
   const CoursesAndGradesPage({super.key,required this.student});
 
-  @override
-  Widget build(BuildContext context) {
+  @override Widget build(final BuildContext context) {
     // Create a sorted copy (IMPORTANT)
     final semesters = [...student.semesters];
     semesters.sort((a, b) => a.name.compareTo(b.name));
@@ -21,7 +20,30 @@ class CoursesAndGradesPage extends StatelessWidget {
         elevation: 0,
       ),
       body: SafeArea(
-        child: ListView.builder(
+        child: semesters.length == 0 ? 
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Container(
+            width: double.infinity,height: 160,
+            padding: const EdgeInsets.all(16), // inner padding for the text
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12), // rounded corners
+            ),
+            child: Center(
+              child: Text(
+                "Δεν βρέθηκαν καταχωρημένες βαθμολογίες.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.w500, // medium weight
+                  color: Color(0xFF536C79), // hex color 536c79
+                ),
+              ),
+            ),
+          ),
+        )
+        
+        : ListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: semesters.length,
           itemBuilder: (context, semIndex) {

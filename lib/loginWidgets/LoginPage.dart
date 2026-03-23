@@ -159,6 +159,9 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: _isLoading ? null : () async {  // disable button when loading
                 usernameController.text = "dit2529cst";
                 passwordController.text = 'PETROS\$69881642';
+
+                // usernameController.text = "xristosxmp";
+                // passwordController.text = 'wolckcho54!';
                   FocusScope.of(context).unfocus();
                   setState(() {
                     _isLoading = true;

@@ -90,12 +90,12 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     children: [
 
                       // ✅ Welcome card
-                      SheetWelcomeWidget(gender: student.gender,name: student.name,textColor: defaultTextColor,),
+                      SheetWelcomeWidget(gender: student.gender,name: student.name,textColor: defaultTextColor),
                       const SizedBox(height: 8),
                       SheetRow(value: student.inscriptionName,textColor: defaultTextColor,isTextCenter: true),
                       const SizedBox(height: 8),
                       /* ΠΡΟΦΙΛ */
-                      RoundedTextContainer(text: "Το προφίλ μου",textColor: defaultTextColor,alignment: Alignment.centerLeft,),
+                      RoundedTextContainer(text: "Το προφίλ μου",textColor: defaultTextColor,alignment: Alignment.centerLeft),
                       SheetRow(icon: "assets/icons/calendar.svg",value: student.entryYear,textColor: defaultTextColor,topSheetRow: true),
                       SheetRow(icon: "assets/icons/id-card.svg",value: student.studentIdentifier,textColor: defaultTextColor,middleSheetRow: true),
                       SheetRow(icon: "assets/icons/email.svg",value: student.email,textColor: defaultTextColor,middleSheetRow: true),
@@ -105,18 +105,16 @@ class _StudentDashboardState extends State<StudentDashboard> {
                       const SizedBox(height: 8),
                       /* ΤΜΗΜΑ */
                       RoundedTextContainer(text: "Τμήμα",textColor: defaultTextColor,alignment: Alignment.centerLeft),
-                      SheetRow(icon: "assets/icons/building.svg",value: student.department.school,textColor: defaultTextColor,topSheetRow: true),
-                      SheetRow(icon: "assets/icons/category.svg",value: student.department.departmentName,textColor: defaultTextColor,middleSheetRow: true),
-                      SheetRow(icon: "assets/icons/url.svg",value: student.department.url,textColor: defaultTextColor,middleSheetRow: true),
+                      if(student.department.school.isNotEmpty) SheetRow(icon: "assets/icons/building.svg",value: student.department.school,textColor: defaultTextColor,topSheetRow: true),
+                      if(student.department.departmentName.isNotEmpty) SheetRow(icon: "assets/icons/category.svg",value: student.department.departmentName,textColor: defaultTextColor,middleSheetRow: true),
+                      if(student.department.url.isNotEmpty) SheetRow(icon: "assets/icons/url.svg",value: student.department.url,textColor: defaultTextColor,middleSheetRow: true),
                       if(student.department.mainPhone.isNotEmpty) SheetRow(icon: "assets/icons/phone.svg",value: student.department.mainPhone,textColor: defaultTextColor,middleSheetRow: true),
                       if(student.department.altPhone.isNotEmpty) SheetRow(icon: "assets/icons/phone.svg",value: student.department.altPhone,textColor: defaultTextColor,middleSheetRow: true),
-                      SheetRow(icon: "assets/icons/location.svg",value: student.department.departmentCity,textColor: defaultTextColor,bottomSheetRow: true),
+                      if(student.department.departmentCity.isNotEmpty) SheetRow(icon: "assets/icons/location.svg",value: student.department.departmentCity,textColor: defaultTextColor,bottomSheetRow: true),
                       const SizedBox(height: 8),
 
                       // ✅ Logout
-                      LogoutWidget(
-                        onTap: () => showConfirmationDialog(context),
-                      ),
+                      LogoutWidget(onTap: () => showConfirmationDialog(context)),
                     ],
                   ),
                 ),

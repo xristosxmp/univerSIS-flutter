@@ -99,7 +99,9 @@ class Student {
       authToken: token,
       currentRegistration: currentRegistration,
       graduationRules: graduationRules,
-      inscriptionName: json["inscriptionMode"]?["name"]?? "ΦΟΙΤΗΤΗΣ",
+      inscriptionName: json["category"]?["name"] 
+          ?? json["inscriptionMode"]?["name"] 
+          ?? "ΦΟΙΤΗΤΗΣ",
       homeAddress: json["person"]?["homeAddress"] ?? ""
     );
   }
@@ -119,7 +121,7 @@ Future<Student> getStudentInfo(final String token) async {
     final List<GraduationRule> graduationRules = await getGraduationRules(token) ?? [];
     return Student.fromJson(jsonData,semesters,recentCoursesGraded,currentRegistration,graduationRules,token);
   } else {
-    throw Exception('Failed to fetch student data');
+    throw Exception('Failed to fetch getStudentInfo');
   }
 }
 
@@ -128,8 +130,7 @@ Future<CurrentRegistration> getCurrentRegistration(final String token) async {
   final response = await http.get(Uri.parse(url),headers: {'Authorization': 'Bearer $token','Accept': 'application/json'});
   if (response.statusCode == 200) {
     final Map<String, dynamic> jsonData = jsonDecode(response.body);
-
-    debugPrint(jsonData.entries.toString());
+    if(jsonData.isEmpty) return CurrentRegistration(period: "",currentRegistrationCourses: []);
     final period =
       (jsonData["registrationPeriod"]?["name"] ?? '') + " " +
       ((jsonData["registrationYear"]?["name"]) ?? '');
@@ -138,7 +139,8 @@ Future<CurrentRegistration> getCurrentRegistration(final String token) async {
     final List<Course> courses = data.map((item) => Course.fromJsonCurrentRegistration(item)).toList();
     return CurrentRegistration(period: period ,currentRegistrationCourses: courses);
   } else {
-    throw Exception('Failed to fetch student data');
+    debugPrint("Failed to fetch getCurrentRegistration");
+    return CurrentRegistration(period: "",currentRegistrationCourses: []);
   }
 
  
@@ -192,7 +194,7 @@ Future<List<Semester>> getSemesters(final String token) async {
       );
     }).toList();
   } else {
-    throw Exception('Failed to fetch semesters');
+    throw Exception('Failed to fetch getSemesters');
   }
 }
 
