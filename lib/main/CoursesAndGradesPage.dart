@@ -5,10 +5,7 @@ import 'package:universis/main/CourseDetailsPage.dart';
 class CoursesAndGradesPage extends StatelessWidget {
   final Student student;
 
-  const CoursesAndGradesPage({
-    super.key,
-    required this.student,
-  });
+  const CoursesAndGradesPage({super.key,required this.student});
 
   @override
   Widget build(BuildContext context) {

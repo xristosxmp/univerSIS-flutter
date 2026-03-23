@@ -1,13 +1,16 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:universis/classes/Auth.dart';
 import 'package:universis/classes/Student.dart';
 import 'package:universis/loginWidgets/LoginPage.dart';
 import 'package:universis/main/CoursesAndGradesPage.dart';
+import 'package:universis/main/CurrentRegistrationWidget.dart';
+import 'package:universis/main/GraduationRulesPage.dart';
 import 'package:universis/main/ProgressIndicatorHomeWidget.dart';
 import 'package:universis/main/RecentGradesWidget.dart';
+import 'package:universis/widgets/MenuTile.dart';
+import 'package:universis/widgets/studentSheet/LabelTabContainer.dart';
 import 'package:universis/widgets/studentSheet/WelcomeWidget.dart';
 import 'package:universis/widgets/studentSheet/SheetWelcomeWidget.dart';
 import 'package:universis/widgets/studentSheet/SheetRow.dart';
@@ -61,7 +64,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return DraggableScrollableSheet(
+        return SafeArea(child: DraggableScrollableSheet(
           initialChildSize: 0.95,
           minChildSize: 0.3,
           maxChildSize: 0.95,
@@ -87,49 +90,27 @@ class _StudentDashboardState extends State<StudentDashboard> {
                     children: [
 
                       // ✅ Welcome card
-                      SheetWelcomeWidget(
-                        gender: student.gender,
-                        name: student.name,
-                        textColor: defaultTextColor,
-                      ),
-
+                      SheetWelcomeWidget(gender: student.gender,name: student.name,textColor: defaultTextColor,),
                       const SizedBox(height: 8),
-
-                      // ✅ Info rows
-                      SheetRow(
-                        icon: "assets/icons/calendar.svg",
-                        value: student.entryYear,
-                        textColor: defaultTextColor,
-                      ),
+                      SheetRow(value: student.inscriptionName,textColor: defaultTextColor,isTextCenter: true),
                       const SizedBox(height: 8),
-
-                      SheetRow(
-                        icon: "assets/icons/id-card.svg",
-                        value: student.studentIdentifier,
-                        textColor: defaultTextColor,
-                      ),
+                      /* ΠΡΟΦΙΛ */
+                      RoundedTextContainer(text: "Το προφίλ μου",textColor: defaultTextColor,alignment: Alignment.centerLeft,),
+                      SheetRow(icon: "assets/icons/calendar.svg",value: student.entryYear,textColor: defaultTextColor,topSheetRow: true),
+                      SheetRow(icon: "assets/icons/id-card.svg",value: student.studentIdentifier,textColor: defaultTextColor,middleSheetRow: true),
+                      SheetRow(icon: "assets/icons/email.svg",value: student.email,textColor: defaultTextColor,middleSheetRow: true),
+                      SheetRow(icon: "assets/icons/time.svg",value: student.semester.toString()+"ο Εξάμηνο",textColor: defaultTextColor,middleSheetRow: true),
+                      SheetRow(icon: "assets/icons/programme.svg",value: student.department.programName,textColor: defaultTextColor,middleSheetRow: true),
+                      SheetRow(icon: "assets/icons/student-home.svg",value: student.homeAddress,textColor: defaultTextColor,bottomSheetRow: true),
                       const SizedBox(height: 8),
-
-                      SheetRow(
-                        icon: "assets/icons/building.svg",
-                        value: student.departmentName,
-                        textColor: defaultTextColor,
-                      ),
-                      const SizedBox(height: 8),
-
-                      SheetRow(
-                        icon: "assets/icons/programme.svg",
-                        value: student.programName,
-                        textColor: defaultTextColor,
-                      ),
-                      const SizedBox(height: 8),
-
-                      SheetRow(
-                        icon: "assets/icons/location.svg",
-                        value: student.departmentCity,
-                        textColor: defaultTextColor,
-                      ),
-
+                      /* ΤΜΗΜΑ */
+                      RoundedTextContainer(text: "Τμήμα",textColor: defaultTextColor,alignment: Alignment.centerLeft),
+                      SheetRow(icon: "assets/icons/building.svg",value: student.department.school,textColor: defaultTextColor,topSheetRow: true),
+                      SheetRow(icon: "assets/icons/category.svg",value: student.department.departmentName,textColor: defaultTextColor,middleSheetRow: true),
+                      SheetRow(icon: "assets/icons/url.svg",value: student.department.url,textColor: defaultTextColor,middleSheetRow: true),
+                      if(student.department.mainPhone.isNotEmpty) SheetRow(icon: "assets/icons/phone.svg",value: student.department.mainPhone,textColor: defaultTextColor,middleSheetRow: true),
+                      if(student.department.altPhone.isNotEmpty) SheetRow(icon: "assets/icons/phone.svg",value: student.department.altPhone,textColor: defaultTextColor,middleSheetRow: true),
+                      SheetRow(icon: "assets/icons/location.svg",value: student.department.departmentCity,textColor: defaultTextColor,bottomSheetRow: true),
                       const SizedBox(height: 8),
 
                       // ✅ Logout
@@ -142,7 +123,7 @@ class _StudentDashboardState extends State<StudentDashboard> {
               ],
             );
           },
-        );
+        ));
       },
     );
   }
@@ -150,73 +131,22 @@ class _StudentDashboardState extends State<StudentDashboard> {
 
     @override Widget build(BuildContext context) {
         final items = <Widget>[
-          WelcomeWidget(
-            student: widget.student,
-            onTap: () => _studentDetailsSheet(widget.student),
-          ),
-
+          WelcomeWidget(student: widget.student,onTap: () => _studentDetailsSheet(widget.student)),
           const SizedBox(height: 16),
-
           ProgressIndicatorHomeWidget(student: widget.student),
-
           const SizedBox(height: 16),
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CoursesAndGradesPage(student: widget.student)
-                ),
-              );
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                //border: Border.all(color: const Color(0xFF5C6BC0), width: 1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  // Left side (icon + text)
-                  SvgPicture.asset(
-                    "assets/icons/puzzle.svg",
-                    width: 26,
-                    height: 26,
-                    color: const Color(0xFF73818e),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    "Αναλυτικη Βαθμολογια",
-                    style: TextStyle(
-                      color: Color(0xFF73818e),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-
-                  const Spacer(),
-
-                  // Right side arrow
-                  const Icon(
-                    Icons.arrow_forward_ios,
-                    size: 16,
-                    color: Color(0xFF73818e),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-
+          MenuTile(svgPath: "assets/icons/puzzle.svg",text: "Αναλυτικη Βαθμολογια",navPage: CoursesAndGradesPage(student: widget.student)),
+          const SizedBox(height: 16),         
+          MenuTile(svgPath: "assets/icons/puzzle.svg",text: "Προυποθέσεις Πτυχίου",navPage: GraduationRulesPage(graduationRules: widget.student.graduationRules)),
           const SizedBox(height: 16),
-
           if (widget.student.recentCoursesGraded.isNotEmpty) ...[
             const SizedBox(height: 32),
             RecentGradesWidget(student: widget.student),
           ],
+          if(widget.student.currentRegistration.currentRegistrationCourses.isNotEmpty) ...[
+            const SizedBox(height: 32),
+            CurrentRegistrationWidget(period: widget.student.currentRegistration.period,courses: widget.student.currentRegistration.currentRegistrationCourses)
+          ]
         ];
 
 

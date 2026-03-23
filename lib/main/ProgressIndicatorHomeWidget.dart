@@ -58,7 +58,7 @@ class ProgressIndicatorHomeWidget extends StatelessWidget {
                 "Δηλωμένα Μαθήματα",
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                   color: Color(0xFF3E515B),
                 ),
               ),
@@ -78,7 +78,7 @@ class ProgressIndicatorHomeWidget extends StatelessWidget {
                 "Περασμένα Μαθήματα",
                 style: TextStyle(
                   fontSize: 12,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w400,
                   color: Color(0xFF3E515B),
                 ),
               ),

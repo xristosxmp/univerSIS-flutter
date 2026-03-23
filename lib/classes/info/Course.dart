@@ -9,7 +9,7 @@ class Course {
   final String ects;
   final String gradePeriod;
   final String gradeExamId;
-
+  final String numberOfStudents;
   final List<Teacher> teachers;
 
 
@@ -23,7 +23,8 @@ class Course {
     required this.type,
     required this.ects,
     required this.gradePeriod,
-    required this.gradeExamId
+    required this.gradeExamId,
+    required this.numberOfStudents
   });
 
   factory Course.fromJson(final Map<String, dynamic> json) {
@@ -52,7 +53,8 @@ class Course {
       type: json['courseType']?['abbreviation'] ?? '',
       ects: json['ects'] != null ? json['ects'].toString() : '0',
       gradePeriod: gradePeriod,
-      gradeExamId: gradeExamId
+      gradeExamId: gradeExamId,
+      numberOfStudents: ''
     );
   }
 
@@ -77,7 +79,37 @@ class Course {
       type: '',
       ects: json["course"]['ects'] != null ? json['ects'].toString() : '0',
       gradePeriod: '',
-      gradeExamId: ''
+      gradeExamId: '',
+      numberOfStudents: ''
+    );
+  }
+
+
+  
+    factory Course.fromJsonCurrentRegistration(final Map<String, dynamic> json) {
+      final courseClass = json['courseClass'];
+
+      List<Teacher> teachers = [];
+
+      if (courseClass != null && courseClass['instructors'] != null) {
+        teachers = (courseClass['instructors'] as List)
+            .map((t) => Teacher.fromJson(t))
+            .toList();
+      }
+
+
+
+    return Course(
+      code: courseClass['course']['id'] ?? '',
+      title: courseClass['course']['name'] ?? '',
+      grade: '',
+      isPassed: false,
+      teachers: teachers,
+      type: json["courseType"]["abbreviation"],
+      ects: json['ects'] != null ? json['ects'].toString() : '0',
+      gradePeriod: '',
+      gradeExamId: '',
+      numberOfStudents: courseClass["numberOfStudents"]!= null ? courseClass['numberOfStudents'].toString() : '-',
     );
   }
 }

@@ -9,7 +9,7 @@ class CourseStatistics {
     required this.total,
   });
 
-  factory CourseStatistics.fromJson(Map<String, dynamic> json) {
+  factory CourseStatistics.fromJson(final Map<String, dynamic> json) {
     return CourseStatistics(
       examGrade: (json['examGrade'] as num).toDouble(),
       isPassed: json['isPassed'] == 1,
