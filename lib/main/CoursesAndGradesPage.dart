@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:universis/classes/Student.dart';
 import 'package:universis/main/CourseDetailsPage.dart';
+import 'package:universis/services/PdfService.dart';
 
 class CoursesAndGradesPage extends StatelessWidget {
   final Student student;
@@ -20,33 +21,128 @@ class CoursesAndGradesPage extends StatelessWidget {
         elevation: 0,
       ),
       body: SafeArea(
-        child: semesters.length == 0 ? 
-        Padding(
+        child: semesters.isEmpty
+      ? Padding(
           padding: const EdgeInsets.all(16),
           child: Container(
-            width: double.infinity,height: 160,
-            padding: const EdgeInsets.all(16), // inner padding for the text
+            width: double.infinity,
+            height: 160,
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(12), // rounded corners
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
+            child: const Center(
               child: Text(
                 "Δεν βρέθηκαν καταχωρημένες βαθμολογίες.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontWeight: FontWeight.w500, // medium weight
-                  color: Color(0xFF536C79), // hex color 536c79
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF536C79),
                 ),
               ),
             ),
           ),
         )
-        
-        : ListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: semesters.length,
-          itemBuilder: (context, semIndex) {
+      : Column(
+          children: [
+                        // 🔘 BUTTON
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  onPressed: () async {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) => const Center(child: CircularProgressIndicator()),
+                    );
+
+                    final file = await PdfService.generateGradesPdf(semesters);
+
+                    Navigator.pop(context); // close loading
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        duration: const Duration(seconds: 10),
+                        behavior: SnackBarBehavior.floating,
+                        margin: const EdgeInsets.fromLTRB(16, 0, 16, 40),
+                        padding: EdgeInsets.zero, // important for custom layout
+                        elevation: 8,
+
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+
+                        content: Stack(
+                          children: [
+                            // 🔲 Main Content
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Center(
+                                    child: Text(
+                                      "Το PDF δημιουργήθηκε επιτυχώς",
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 12),
+
+                                  Center(
+                                    child: TextButton(
+                                      onPressed: () {
+                                        PdfService.openFile(file);
+                                      },
+                                      child: const Text("Ανοιγμα αρχειου PDF"),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // ❌ Close Button (top right)
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: IconButton(
+                                icon: const Icon(Icons.close,color: Colors.white),
+                                splashRadius: 20,
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Εκτύπωση Αναλυτικής",
+                    style: TextStyle(
+                      color: Color(0xFF151B1E),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+           Expanded(
+              child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: semesters.length,
+              itemBuilder: (context, semIndex) {
             final semester = semesters[semIndex];
 
             return Column(
@@ -173,8 +269,8 @@ class CoursesAndGradesPage extends StatelessWidget {
               ],
             );
           },
-        ),
-      ),
+           )),
+      ])),
     );
   }
 }
