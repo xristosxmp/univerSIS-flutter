@@ -1,14 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:universis/auth/auth.dart';
 import 'package:universis/classes/Auth.dart';
 import 'package:universis/classes/Student.dart';
 import 'package:universis/exceptions/UnauthorizedException.dart';
 import 'package:universis/loginWidgets/LoginPage.dart';
-import 'package:universis/main/MainPage.dart';
 import 'package:universis/main/StudentDashboard.dart';
 
 
@@ -21,23 +18,21 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 5), (){
-      route();
+      _route();
     });
   }
 
 
 
-  route() async {
-
+  _route() async {
     bool isActive = await Auth.isStudentActive();
     if (isActive) {
           try {
-            Auth? activeUser = await Auth.getStudent();
+            final Auth? activeUser = await Auth.getStudent();
             if(activeUser == null) Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
-      
-            AuthClient client = AuthClient();
-            String token = await client.login(activeUser!.username, activeUser.password);
-            Student student = await getStudentInfo(token);
+            final AuthClient client = AuthClient();
+            final String token = await client.login(activeUser!.username, activeUser.password);
+            final Student student = await getStudentInfo(token);
             return Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => StudentDashboard(student: student)));
           } on UnauthorizedException {
               return Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
@@ -48,8 +43,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     return Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
-  @override
-  Widget build(BuildContext context) {
+  @override Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 255, 255, 255),
       resizeToAvoidBottomInset: true,

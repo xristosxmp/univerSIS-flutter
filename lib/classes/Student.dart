@@ -36,8 +36,10 @@ class Student {
   final List<Course> recentCoursesGraded;
 
   final String averageGrade;
+  final String averageGradeBasedOnEcts;
   final int totalCourses;
   final int totalPassedCourses;
+  final String totalEctsGathered;
 
   final CurrentRegistration currentRegistration;
   final List<GraduationRule> graduationRules;
@@ -54,6 +56,7 @@ class Student {
     required this.entryYear,
     required this.semesters,
     required this.averageGrade,
+    required this.averageGradeBasedOnEcts,
     required this.totalCourses,
     required this.totalPassedCourses,
     required this.recentCoursesGraded,
@@ -61,6 +64,7 @@ class Student {
     required this.graduationRules,
     required this.inscriptionName,
     required this.homeAddress,
+    required this.totalEctsGathered,
   });
 
   factory Student.fromJson(
@@ -71,7 +75,10 @@ class Student {
     List<GraduationRule> graduationRules,
     String token,
   ) {
-    double total = 0;
+    double totalGrade = 0;
+    double totalEcts = 0;
+    double weightedGrade = 0;
+
     int gradedCount = 0;
     int totalCourses = 0;
     int totalPassed = 0;
@@ -83,14 +90,27 @@ class Student {
         final grade = double.tryParse(course.grade);
         if (grade == null) continue;
 
-        if (course.isPassed) totalPassed++;
-        total += grade;
+        final ects = double.tryParse(course.ects) ?? 0;
+
+        totalGrade += grade;
         gradedCount++;
+
+        if (course.isPassed) {
+          totalPassed++;
+          totalEcts += ects;
+          weightedGrade += grade * ects;
+        }
       }
     }
 
-    final avgGrade =
-        gradedCount > 0 ? (total / gradedCount).toStringAsFixed(2) : 'N/A';
+    // ✅ Safe calculations
+    final averageGrade = gradedCount > 0
+        ? (totalGrade / gradedCount).toStringAsFixed(2)
+        : 'N/A';
+
+    final averageGradeBasedOnEcts = totalEcts > 0
+        ? (weightedGrade / totalEcts).toStringAsFixed(2)
+        : '0.00';
 
     return Student(
       name: json['person']?['name'] ?? '',
@@ -101,17 +121,23 @@ class Student {
       semester: json['semester'] ?? -1,
       entryYear: json['inscriptionYear']?['alternateName'] ?? '',
       semesters: semesters,
-      averageGrade: avgGrade,
+
+      averageGrade: averageGrade,
+      averageGradeBasedOnEcts: averageGradeBasedOnEcts,
       totalCourses: totalCourses,
       totalPassedCourses: totalPassed,
+      totalEctsGathered: totalEcts.toStringAsFixed(1),
+
       recentCoursesGraded: recentCoursesGraded,
       authToken: token,
       currentRegistration: currentRegistration,
       graduationRules: graduationRules,
+
       inscriptionName:
           json["category"]?["name"] ??
           json["inscriptionMode"]?["name"] ??
           "ΦΟΙΤΗΤΗΣ",
+
       homeAddress: json["person"]?["homeAddress"] ?? "",
     );
   }
@@ -222,19 +248,26 @@ Future<List<Semester>> getSemesters(String token) async {
     double total = 0;
     int count = 0;
 
+    double ects = 0;
+    double totalSemesterEcts = 0;
+
+
     for (final course in entry.value) {
       final grade = double.tryParse(course.grade);
       if (grade != null) {
         total += grade;
+        if(course.isPassed) ects += double.parse(course.ects);
         count++;
       }
+      totalSemesterEcts += double.parse(course.ects);
     }
 
     return Semester(
       name: entry.key,
       courses: entry.value,
-      averageGrade:
-          count > 0 ? (total / count).toStringAsFixed(2) : '-',
+      averageGrade: count > 0 ? (total / count).toStringAsFixed(2) : '-',
+      ects: ects.toString(),
+      totalEcts: totalSemesterEcts.toString()
     );
   }).toList();
 }
