@@ -6,14 +6,9 @@ class SemesterSection extends StatelessWidget {
   final Semester semester;
   final String authToken;
 
-  const SemesterSection({
-    super.key,
-    required this.semester,
-    required this.authToken,
-  });
+  const SemesterSection({super.key,required this.semester, required this.authToken});
 
-  @override
-  Widget build(BuildContext context) {
+  @override Widget build(final BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -63,7 +58,19 @@ class SemesterSection extends StatelessWidget {
         const SizedBox(height: 10),
 
         // 📖 Courses List
-        ListView.builder(
+        semester.courses.isEmpty
+        ? const Padding(
+          padding: EdgeInsets.all(6.0),
+          child: Text(
+            "Δεν βρέθηκαν καταχωρημένες βαθμολογίες.",
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey,
+            ),
+          ),
+        )
+        : ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: semester.courses.length,

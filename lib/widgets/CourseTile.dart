@@ -11,12 +11,10 @@ class CourseTile extends StatelessWidget {
     required this.authToken,
   });
 
-  @override
-  Widget build(BuildContext context) {
+  @override Widget build(BuildContext context) {
     final hasGradePeriod = course.gradePeriod.trim().isNotEmpty;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
       onTap: () {
         Navigator.push(
           context,

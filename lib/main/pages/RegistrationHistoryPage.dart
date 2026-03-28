@@ -16,7 +16,7 @@ class RegistrationHistoryPage extends StatelessWidget {
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(6, 1, 6, 1),
           child: registrationHistoryItem.length == 0 ?  
               const Text(
                 "Δεν βρέθηκε ιστορικό δηλώσεων.",
@@ -27,67 +27,77 @@ class RegistrationHistoryPage extends StatelessWidget {
                 ),
               )
           :
-              Column(
-                 crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      const Text(
-                        "Ιστορικό Δηλώσεων",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF3e515b)
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        "Η παρακάτω λίστα εμφανίζει το ιστορικό των δηλώσεών σας ανά ακαδημαϊκό έτος.",
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xFF151b1e),
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-                      Expanded(child: ListView.builder(
-                        itemCount: registrationHistoryItem.length,
-                        itemBuilder: (context, indx) {
-                          final registrationTabItem = registrationHistoryItem[indx];
-                          return Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: registrationHistoryItem.length + 1, // +1 for the header
+                  itemBuilder: (context, indx) {
+                    if (indx == 0) {
+                      // Header: title + description
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              "Ιστορικό Δηλώσεων",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF3e515b),
+                              ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(registrationTabItem.period),
-                                const SizedBox(height: 16),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: List.generate(
-                                    registrationTabItem.courses.length,
-                                    (index) {
-                                      final course = registrationTabItem.courses[index];
-
-                                      return RegistrationCourseItemDesign(
-                                        course: course,
-                                        index: index,
-                                        total: registrationTabItem.courses.length,
-                                      );
-                                    },
-                                  ),
-                                )
-                                
-
-                              ],
+                            SizedBox(height: 4),
+                            Text(
+                              "Η παρακάτω λίστα εμφανίζει το ιστορικό των δηλώσεών σας ανά ακαδημαϊκό έτος.",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: Color(0xFF151b1e),
+                              ),
                             ),
-                          );
-                        },
-                      ))
-                    ],
-            )),
+                            SizedBox(height: 16),
+                          ],
+                        ),
+                      );
+                    }
+
+                    // Adjust index because first item is header
+                    final registrationTabItem = registrationHistoryItem[indx - 1];
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(registrationTabItem.period),
+                          const SizedBox(height: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: List.generate(
+                              registrationTabItem.courses.length,
+                              (index) {
+                                final course = registrationTabItem.courses[index];
+
+                                return RegistrationCourseItemDesign(
+                                  course: course,
+                                  index: index,
+                                  total: registrationTabItem.courses.length,
+                                );
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              )
+            ),
           ),
         );
   }
