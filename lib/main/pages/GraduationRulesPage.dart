@@ -7,8 +7,7 @@ class GraduationRulesPage extends StatelessWidget {
 
   const GraduationRulesPage({super.key,required this.graduationRules});
 
-  @override
-  Widget build(BuildContext context) {
+  @override Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 240, 240, 240),
       appBar: AppBar(
@@ -22,7 +21,6 @@ class GraduationRulesPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 🔹 Your top texts
               const Text(
                 "Πτυχίο",
                 style: TextStyle(

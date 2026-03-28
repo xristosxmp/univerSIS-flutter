@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:universis/main/CourseDetailsPage.dart';
+import 'package:universis/main/pages/CourseDetailsPage.dart';
 
 class CourseTile extends StatelessWidget {
   final dynamic course;

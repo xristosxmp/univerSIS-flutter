@@ -3,7 +3,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:linear_progress_bar/ui/circular_percent_indicator.dart';
 import 'package:universis/classes/info/Course.dart';
-import 'package:universis/main/CourseStatisticsWidget.dart';
+import 'package:universis/main/pages/CourseStatisticsWidget.dart';
 
 class CourseDetailsPage extends StatelessWidget {
   final Course course;

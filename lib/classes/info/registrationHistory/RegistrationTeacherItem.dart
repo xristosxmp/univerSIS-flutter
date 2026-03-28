@@ -1,17 +1,16 @@
-class Teacher {
+
+class RegistrationTeacherItem {
   final String name;
 
-  Teacher({
-    required this.name,
+  RegistrationTeacherItem({
+    required this.name
   });
 
-  factory Teacher.fromJson(final Map<String, dynamic> json) {
+  factory RegistrationTeacherItem.fromJson(final Map<String, dynamic> json) {
     final instructor = json['instructor'];
-
     final String firstName = instructor?['givenName'] ?? '';
     final String lastName = instructor?['familyName'] ?? '';
-
-    return Teacher(
+    return RegistrationTeacherItem(
       name: '$firstName $lastName',
     );
   }

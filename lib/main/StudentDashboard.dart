@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:universis/classes/Auth.dart';
 import 'package:universis/classes/Student.dart';
 import 'package:universis/loginWidgets/LoginPage.dart';
-import 'package:universis/main/CoursesAndGradesPage.dart';
-import 'package:universis/main/CurrentRegistrationWidget.dart';
-import 'package:universis/main/GraduationRulesPage.dart';
-import 'package:universis/main/ProgressIndicatorHomeWidget.dart';
-import 'package:universis/main/RecentGradesWidget.dart';
+import 'package:universis/main/pages/CoursesAndGradesPage.dart';
+import 'package:universis/main/pages/CurrentRegistrationWidget.dart';
+import 'package:universis/main/pages/GraduationRulesPage.dart';
+import 'package:universis/main/pages/ProgressIndicatorHomeWidget.dart';
+import 'package:universis/main/pages/RecentGradesWidget.dart';
+import 'package:universis/main/pages/RegistrationHistoryPage.dart';
+import 'package:universis/main/pages/ThesesPage.dart';
 import 'package:universis/widgets/MenuTile.dart';
 import 'package:universis/widgets/studentSheet/LabelTabContainer.dart';
 import 'package:universis/widgets/studentSheet/WelcomeWidget.dart';
@@ -136,6 +138,10 @@ class _StudentDashboardState extends State<StudentDashboard> {
           MenuTile(svgPath: "assets/icons/puzzle.svg",text: "Αναλυτικη Βαθμολογια",navPage: CoursesAndGradesPage(student: widget.student)),
           const SizedBox(height: 16),         
           MenuTile(svgPath: "assets/icons/puzzle.svg",text: "Προυποθέσεις Πτυχίου",navPage: GraduationRulesPage(graduationRules: widget.student.graduationRules)),
+          const SizedBox(height: 16),
+          MenuTile(svgPath: "assets/icons/puzzle.svg",text: "Εργασίες",navPage: ThesesPage(theses: widget.student.theses)),
+          const SizedBox(height: 16),
+          MenuTile(svgPath: "assets/icons/puzzle.svg",text: "Προηγούμενες Δηλώσεις",navPage: RegistrationHistoryPage(registrationHistoryItem: widget.student.registrationHistoryitem)),
           const SizedBox(height: 16),
           if (widget.student.recentCoursesGraded.isNotEmpty) ...[
             const SizedBox(height: 32),

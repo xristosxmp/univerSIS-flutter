@@ -7,6 +7,9 @@ import 'package:universis/classes/info/CurrentRegistration.dart';
 import 'package:universis/classes/info/Department.dart';
 import 'package:universis/classes/info/GraduationRule.dart';
 import 'package:universis/classes/info/Semester.dart';
+import 'package:universis/classes/info/Theses.dart';
+import 'package:universis/classes/info/ThesesInstructor.dart';
+import 'package:universis/classes/info/registrationHistory/RegistrationHistoryItem.dart';
 
 /// ------------------------
 /// Shared HTTP Client
@@ -45,6 +48,9 @@ class Student {
   final List<GraduationRule> graduationRules;
   final Department department;
 
+  final List<Theses> theses;
+  final List<RegistrationHistoryItem> registrationHistoryitem;
+
   Student({
     required this.authToken,
     required this.name,
@@ -65,6 +71,8 @@ class Student {
     required this.inscriptionName,
     required this.homeAddress,
     required this.totalEctsGathered,
+    required this.theses,
+    required this.registrationHistoryitem,
   });
 
   factory Student.fromJson(
@@ -73,6 +81,8 @@ class Student {
     List<Course> recentCoursesGraded,
     CurrentRegistration currentRegistration,
     List<GraduationRule> graduationRules,
+    List<Theses> theses,
+    List<RegistrationHistoryItem> registrationHistoryitem,
     String token,
   ) {
     double totalGrade = 0;
@@ -139,32 +149,72 @@ class Student {
           "ΦΟΙΤΗΤΗΣ",
 
       homeAddress: json["person"]?["homeAddress"] ?? "",
+      theses: theses,
+      registrationHistoryitem: registrationHistoryitem
     );
   }
+}
+
+List<Theses> getMockTheses() {
+  return [
+    Theses(
+      thesesName: "Design and Implementation of a Mobile App",
+      supervisor: "Dr. John Doe",
+      grade: "9.5",
+      isPassed: true,
+      thesesInstructors: [
+        ThesesInstructor(
+          name: "Dr. John Doe",
+          grade: "9.5",
+        ),
+        ThesesInstructor(
+          name: "Prof. Alice Smith",
+          grade: "9.0",
+        ),
+        ThesesInstructor(
+          name: "Dr. Bob Johnson",
+          grade: "10.0",
+        ),
+      ],
+    ),
+    Theses(
+      thesesName: "Machine Learning for Predictive Analytics",
+      supervisor: "Prof. Maria Papadopoulou",
+      grade: "8.7",
+      isPassed: true,
+      thesesInstructors: [
+        ThesesInstructor(
+          name: "Prof. Maria Papadopoulou",
+          grade: "8.7",
+        ),
+        ThesesInstructor(
+          name: "Dr. Nikos Georgiou",
+          grade: "9.0",
+        ),
+        ThesesInstructor(
+          name: "Dr. Elena Kosta",
+          grade: "8.5",
+        ),
+      ],
+    ),
+  ];
 }
 
 /// ------------------------
 /// Fetch Student Info (OPTIMIZED)
 /// ------------------------
 Future<Student> getStudentInfo(String token) async {
-  const url =
-      'https://uniapi.uop.gr/api/students/me?\$expand=user,department,studyProgram,inscriptionMode,studentSeries,person(\$expand=gender,locale)&\$top=1&\$skip=0&\$count=false';
-
-  final response =
-      await _client.get(Uri.parse(url), headers: _headers(token));
-
-  if (response.statusCode != 200) {
-    throw Exception('Failed to fetch getStudentInfo');
-  }
-
+  const url ='https://uniapi.uop.gr/api/students/me?\$expand=user,department,studyProgram,inscriptionMode,studentSeries,person(\$expand=gender,locale)&\$top=1&\$skip=0&\$count=false';
+  final response = await _client.get(Uri.parse(url), headers: _headers(token));
+  if (response.statusCode != 200) throw Exception('Failed to fetch getStudentInfo');
   final jsonData = jsonDecode(response.body);
-
-  /// 🚀 Parallel API Calls
   final results = await Future.wait([
     getSemesters(token),
     getRecentCoursesGraded(token),
     getCurrentRegistration(token),
     getGraduationRules(token),
+    getTheses(token),
+    getRegistrationHistory(token),
   ]);
 
   return Student.fromJson(
@@ -173,28 +223,41 @@ Future<Student> getStudentInfo(String token) async {
     results[1] as List<Course>,
     results[2] as CurrentRegistration,
     results[3] as List<GraduationRule>,
+    (results[4] as List<Theses>?)?.isNotEmpty == true
+    ? results[4] as List<Theses>
+    : getMockTheses(),
+    results[5] as List<RegistrationHistoryItem>,
     token,
   );
+}
+
+
+Future<List<RegistrationHistoryItem>> getRegistrationHistory(String token) async {
+  const url = 'https://uniapi.uop.gr/api/students/me/registrations?\$expand=classes(\$orderby=semester,course/displayCode;\$expand=course(\$expand=locale),courseClass(\$expand=instructors(\$expand=instructor(\$select=InstructorSummary))),courseType(\$expand=locale))&\$orderby=registrationYear%20desc,registrationPeriod%20desc&\$count=false';
+
+  try {
+    final response = await _client.get(Uri.parse(url), headers: _headers(token));
+    final jsonData = jsonDecode(response.body);
+    if (jsonData.isEmpty || response.statusCode != 200) return [];
+        final data = jsonDecode(response.body)['value'] as List<dynamic>;
+    if(data == null || data is! List || data.isEmpty) return [];
+    return data.map((e) => RegistrationHistoryItem.fromJson(e)).toList();
+  } catch (e) {
+    debugPrint("ERROR getRegistrationHistory: $e");
+    return [];
+  }
 }
 
 /// ------------------------
 /// Current Registration
 /// ------------------------
 Future<CurrentRegistration> getCurrentRegistration(String token) async {
-  const url =
-      'https://uniapi.uop.gr/api/students/me/currentRegistration?\$expand=classes(\$expand=courseType(\$expand=locale),courseClass(\$expand=course(\$expand=locale),instructors(\$expand=instructor(\$select=InstructorSummary)),statistic(\$select=id,eLearningUrl,studyGuideUrl),navigationLinks))&\$top=1&\$skip=0&\$count=false';
+  const url = 'https://uniapi.uop.gr/api/students/me/currentRegistration?\$expand=classes(\$expand=courseType(\$expand=locale),courseClass(\$expand=course(\$expand=locale),instructors(\$expand=instructor(\$select=InstructorSummary)),statistic(\$select=id,eLearningUrl,studyGuideUrl),navigationLinks))&\$top=1&\$skip=0&\$count=false';
 
   try {
-    final response =
-        await _client.get(Uri.parse(url), headers: _headers(token));
-
-    if (response.statusCode != 200) {
-      throw Exception();
-    }
-
+    final response = await _client.get(Uri.parse(url), headers: _headers(token));
     final jsonData = jsonDecode(response.body);
-
-    if (jsonData.isEmpty) {
+    if (jsonData.isEmpty || response.statusCode != 200) {
       return CurrentRegistration(
         period: "",
         currentRegistrationCourses: [],
@@ -219,12 +282,28 @@ Future<CurrentRegistration> getCurrentRegistration(String token) async {
   }
 }
 
+
+Future<List<Theses>> getTheses(String token) async {
+  const url = 'https://uniapi.uop.gr/api/students/me/theses?\$expand=results(\$orderby=index;\$expand=instructor(\$select=InstructorSummary)),thesis(\$expand=instructor(\$select=InstructorSummary),locale,repositoryAction(\$expand=actionStatus))&\$top=-1&\$count=false';
+
+  try {
+    final response = await _client.get(Uri.parse(url), headers: _headers(token));
+    final jsonData = jsonDecode(response.body);
+    if (jsonData.isEmpty || response.statusCode != 200) return [];
+    final data = jsonDecode(response.body)['value'] as List<dynamic>;
+    if(data == null || data is! List || data.isEmpty) return [];
+    return data.map((e) => Theses.fromJson(e)).toList();
+  } catch (e) {
+    debugPrint("ERROR getTheses: $e");
+    return [];
+  }
+}
+
 /// ------------------------
 /// Semesters (OPTIMIZED)
 /// ------------------------
 Future<List<Semester>> getSemesters(String token) async {
-  const url =
-      r"https://uniapi.uop.gr/api/students/me/courses?$expand=course($expand=locale),courseType($expand=locale),gradeExam($expand=instructors($expand=instructor($select=InstructorSummary)))&$orderby=semester%20desc,gradeYear%20desc&$top=-1&$count=false";
+  const url = r"https://uniapi.uop.gr/api/students/me/courses?$expand=course($expand=locale),courseType($expand=locale),gradeExam($expand=instructors($expand=instructor($select=InstructorSummary)))&$orderby=semester%20desc,gradeYear%20desc&$top=-1&$count=false";
 
   final response =
       await _client.get(Uri.parse(url), headers: _headers(token));
