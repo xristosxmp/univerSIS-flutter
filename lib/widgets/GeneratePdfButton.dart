@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:universis/classes/Student.dart';
 import 'package:universis/classes/info/Semester.dart';
 import 'package:universis/services/PdfService.dart';
 
 class GeneratePdfButton extends StatelessWidget {
   final List<Semester> semesters;
+  final Student student;
 
-  const GeneratePdfButton({super.key,required this.semesters});
+  const GeneratePdfButton({super.key,required this.semesters, required this.student});
 
   @override Widget build(BuildContext context) {
     return SizedBox(
@@ -30,7 +32,7 @@ class GeneratePdfButton extends StatelessWidget {
             builder: (_) => const Center(child: CircularProgressIndicator()),
           );
 
-          final file = await PdfService.generateGradesPdf(semesters);
+          final file = await PdfService.generateGradesPdf(semesters,student);
 
           Navigator.pop(context);
 

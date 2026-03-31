@@ -37,13 +37,26 @@ class ProgressIndicatorHomeWidget extends StatelessWidget {
             startAngle: CircularStartAngle.bottom,
             spacing: 0.0,
             arcType: ArcType.full,
-            center: Text(
-              "${student.averageGrade}\nΜ.Ο",
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
+            center: Text.rich(
+              TextSpan(
+                text: "${student.averageGrade}\n",
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                children: [
+                  TextSpan(
+                    text: "Μ.Ο",
+                    style: const TextStyle(
+                      fontSize: 12, // smaller
+                      color: Color(0xFF3E515B), // your color
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
               ),
+              textAlign: TextAlign.center,
             ),
           ),
 

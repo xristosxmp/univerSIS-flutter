@@ -47,7 +47,7 @@ class _CoursesAndGradesPageState extends State<CoursesAndGradesPage> {
                   if (index == 0) {
                     return Column(
                       children: [
-                        GeneratePdfButton(semesters: semesters),
+                        GeneratePdfButton(semesters: semesters, student: widget.student),
                         const SizedBox(height: 16),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),width: double.infinity,

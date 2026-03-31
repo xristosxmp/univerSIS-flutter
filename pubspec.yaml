@@ -50,4 +50,5 @@ flutter:
     - assets/icons/
     - assets/fonts/
     - assets/fonts/ARIAL.TTF
+    - assets/pdf/
 
