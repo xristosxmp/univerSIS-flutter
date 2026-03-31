@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:universis/classes/Auth.dart';
@@ -103,13 +102,14 @@ class _StudentDashboardState extends State<StudentDashboard> {
                       SheetRow(icon: "assets/icons/email.svg",value: student.email,textColor: defaultTextColor,middleSheetRow: true),
                       SheetRow(icon: "assets/icons/time.svg",value: student.semester.toString()+"ο Εξάμηνο",textColor: defaultTextColor,middleSheetRow: true),
                       SheetRow(icon: "assets/icons/programme.svg",value: student.department.programName,textColor: defaultTextColor,middleSheetRow: true),
-                      SheetRow(icon: "assets/icons/student-home.svg",value: student.homeAddress,textColor: defaultTextColor,bottomSheetRow: true),
+                      SheetRow(icon: "assets/icons/location.svg",value: student.homeAddress,textColor: defaultTextColor,bottomSheetRow: true),
                       const SizedBox(height: 8),
                       /* ΤΜΗΜΑ */
                       RoundedTextContainer(text: "Τμήμα",textColor: defaultTextColor,alignment: Alignment.centerLeft),
                       if(student.department.school.isNotEmpty) SheetRow(icon: "assets/icons/building.svg",value: student.department.school,textColor: defaultTextColor,topSheetRow: true),
                       if(student.department.departmentName.isNotEmpty) SheetRow(icon: "assets/icons/category.svg",value: student.department.departmentName,textColor: defaultTextColor,middleSheetRow: true),
                       if(student.department.url.isNotEmpty) SheetRow(icon: "assets/icons/url.svg",value: student.department.url,textColor: defaultTextColor,middleSheetRow: true),
+                      if(student.department.email.isNotEmpty) SheetRow(icon: "assets/icons/email.svg",value: student.department.email,textColor: defaultTextColor,middleSheetRow: true),
                       if(student.department.mainPhone.isNotEmpty) SheetRow(icon: "assets/icons/phone.svg",value: student.department.mainPhone,textColor: defaultTextColor,middleSheetRow: true),
                       if(student.department.altPhone.isNotEmpty) SheetRow(icon: "assets/icons/phone.svg",value: student.department.altPhone,textColor: defaultTextColor,middleSheetRow: true),
                       if(student.department.departmentCity.isNotEmpty) SheetRow(icon: "assets/icons/location.svg",value: student.department.departmentCity,textColor: defaultTextColor,bottomSheetRow: true),

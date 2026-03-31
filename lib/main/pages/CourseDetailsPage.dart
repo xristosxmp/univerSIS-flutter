@@ -152,16 +152,18 @@ Widget _buildGradeIndicator() {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AutoSizeText(
                     leftLabel,
+                    textAlign: TextAlign.left,
                     style: const TextStyle(fontSize: 14, color: Colors.grey, fontWeight: FontWeight.w500),
                     minFontSize: 11,
                     maxLines: 1,
                   ),
                   const SizedBox(height: 6),
                   AutoSizeText(
+                    textAlign: TextAlign.left,
                     leftValue,
                     style: const TextStyle(fontSize: 14, color: Colors.black),
                     minFontSize: 11,
@@ -182,7 +184,7 @@ Widget _buildGradeIndicator() {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AutoSizeText(
                     rightLabel,
